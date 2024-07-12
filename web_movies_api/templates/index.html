@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie List</title>
+</head>
+<body>
+    <h1>Movie List</h1>
+    <form id="movie-form" enctype="multipart/form-data">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title"><br><br>
+        <label for="description">Description:</label><br>
+        <input type="text" id="description" name="description"><br><br>
+        <label for="release_date">Release Date:</label><br>
+        <input type="date" id="release_date" name="release_date"><br><br>
+        <label for="rating">Rating:</label><br>
+        <input type="text" id="rating" name="rating"><br><br>
+        <label for="movie_type">Movie Type:</label><br>
+        <select id="movie_type" name="movie_type">
+            <option value="1">Movie 1</option>
+            <option value="2">Movie 2</option>
+        </select><br><br>
+        <label for="image">Image:</label><br>
+        <input type="file" id="image" name="image"><br><br>
+        <button type="button" onclick="submitForm()">Submit</button>
+    </form>
+    <h2>Movies</h2>
+    <ul id="movie-list">
+        <!-- Movie list sẽ được hiển thị ở đây -->
+    </ul>
+    <script>
+        // Lấy danh sách phim từ API và hiển thị
+        fetch('/api/movies/')
+            .then(response => response.json())
+            .then(data => {
+                const movieList = document.getElementById('movie-list');
+                data.forEach(movie => {
+                    const li = document.createElement('li');
+                    li.textContent = `Title: ${movie.title}, Description: ${movie.description}, Release Date: ${movie.release_date}, Rating: ${movie.rating}, Movie Type: ${movie.movie_type}, Image: ${movie.image}`;
+                    movieList.appendChild(li);
+                });
+            });
+
+        // Gửi dữ liệu form tới API để thêm phim mới
+        function submitForm() {
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('release_date', document.getElementById('release_date').value);
+            formData.append('rating', document.getElementById('rating').value);
+            formData.append('movie_type', document.getElementById('movie_type').value);
+            formData.append('image', document.getElementById('image').files[0]);
+
+            fetch('/api/movies/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Thêm phim mới vào danh sách phim
+                const movieList = document.getElementById('movie-list');
+                const li = document.createElement('li');
+                li.textContent = `Title: ${data.title}, Description: ${data.description}, Release Date: ${data.release_date}, Rating: ${data.rating}, Movie Type: ${data.movie_type}, Image: ${data.image}`;
+                movieList.appendChild(li);
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
+</body>
+</html>
